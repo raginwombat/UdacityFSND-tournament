@@ -17,7 +17,7 @@ def deleteMatches():
         Requires: player_record and matches Tables exist
         Gets: Nothing
         Modifies: Wins and losses for players 0, removes all matches"""
-    DB= psycopg2.connect("dbname=tournament")
+    DB= connect()
     c = DB.cursor()
     c.execute('delete from matches *;')
     c.execute('update player_records set wins=0,  losses=0 where id  <> Null;')
@@ -32,7 +32,7 @@ def deletePlayers():
         Requires: Tables, players, player_records and matches exist
         Gets: Nothing
         Modifies: All tables are zeroed out"""
-    DB= psycopg2.connect("dbname=tournament")
+    DB= connect()
     c = DB.cursor()
     
     c.execute('delete from matches  *');
@@ -47,7 +47,7 @@ def countPlayers():
         Requires: 
         Gets: Nothing
         Modifies: """
-    DB= psycopg2.connect("dbname=tournament")
+    DB= connect()
     c = DB.cursor()
     c.execute('select count(*) from players;');
     playersCount = c.fetchone()[0]
@@ -96,7 +96,7 @@ def playerStandings():
          Requires: 
         Gets: Nothing
         Modifies: """
-    DB= psycopg2.connect("dbname=tournament")
+    DB= connect()
     c = DB.cursor()
 
     query = '''select players.id,name, player_records.wins, (player_records.wins + player_records.losses) as matches
@@ -118,7 +118,7 @@ def reportMatch(winner, loser):
         Modifies: 
 
         notes make a try and catch for error handlling w/ bd ID number"""
-    DB= psycopg2.connect("dbname=tournament")
+    DB= connect()
     c = DB.cursor()
     """ Get win and loss, increment for player
         check if player exists, if doesn't then insert"""
@@ -130,7 +130,7 @@ def reportMatch(winner, loser):
     
     c.execute(query1, (winner,loser));
     DB.commit()
-    updatePlayerRecords()
+    updatePlayerRecords(winner, loser)
 
     DB.close()
  
@@ -152,7 +152,7 @@ def swissPairings():
        Requires: 
         Gets: Nothing
         Modifies: """
-    DB= psycopg2.connect("dbname=tournament")
+    DB= connect()
     c = DB.cursor()
     c.execute('''select players.id, players.name
                 from players
@@ -169,22 +169,23 @@ def swissPairings():
     return pairings
 
 
-def updatePlayerRecords():
+def updatePlayerRecords(winner, loser):
     '''Winner player reocrd update
         Requires: This libary requires players to be registerd and to have matches
         for the player reocrd to be updated correcly
-
-
     '''    
 
 
-    DB= psycopg2.connect("dbname=tournament")
+    DB= connect()
     c = DB.cursor()
+
+    print "update player records"
     query1 = '''update player_records
                 set
                     wins = (select count(winner) from matches where winner = %s),
                     losses = (select count(loser) from matches where loser = %s)
                 where id = %s;'''
+
     '''loser player record update'''
     query2 =  '''update player_records
                 set
@@ -192,7 +193,9 @@ def updatePlayerRecords():
                     losses = (select count(*) from matches where loser = %s)
                 where id = %s;'''
     c.execute(query1, (winner, winner, winner));
+    print "query 1 executed"
     c.execute(query2, (loser, loser, loser));
+    print "query 2 executed"
     DB.commit()
     DB.close()
 
@@ -209,7 +212,7 @@ def playerExists(id):
         return true
 
 def OMW(player_id):
-    '''select the player and sum all of the  wins form oponent'''
+    '''select the player and sum all of the  wins from  oponent'''
     DB =  connect()
     
     oponents 
