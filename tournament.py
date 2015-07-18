@@ -38,7 +38,6 @@ def deletePlayers():
     c.execute('delete from matches  *');
     c.execute('delete from player_records *');
     c.execute('delete from players  *');
-   # c.execute('alter sequence players_id_seq Restart with 1;');
     DB.commit()
     DB.close()
 
@@ -69,9 +68,6 @@ def registerPlayer(name):
         notes make a try and catch for error handlling w/ bd  name"""
     DB= connect()
     c = DB.cursor()
-    #query = 'insert into players(name) Values(%s)'
-    #param = (name,)
-    #c.execute(query, param)
     c.execute('insert into players(name) Values(%s)', (name,) );
     """ Get the player ID number for initializing the player record"""
     c.execute ('select id from players where name = %s', (name, ))
@@ -179,7 +175,7 @@ def updatePlayerRecords(winner, loser):
     DB= connect()
     c = DB.cursor()
 
-    print "update player records"
+    
     query1 = '''update player_records
                 set
                     wins = (select count(winner) from matches where winner = %s),
@@ -193,9 +189,7 @@ def updatePlayerRecords(winner, loser):
                     losses = (select count(*) from matches where loser = %s)
                 where id = %s;'''
     c.execute(query1, (winner, winner, winner));
-    print "query 1 executed"
     c.execute(query2, (loser, loser, loser));
-    print "query 2 executed"
     DB.commit()
     DB.close()
 
@@ -210,9 +204,11 @@ def playerExists(id):
         return false
     else:
         return true
-
+'''
+Stub to implmenet OMW 
 def OMW(player_id):
     '''select the player and sum all of the  wins from  oponent'''
     DB =  connect()
     
     oponents 
+'''
