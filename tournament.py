@@ -8,7 +8,9 @@ import psycopg2
 
 def connect():
     """Connect to the PostgreSQL database.  Returns a database connection."""
-    return psycopg2.connect("dbname=tournament")
+    DB = psycopg2.connect("dbname=tournament")
+    c = DB.cursor()
+    return (DB, c)
 
 
 def deleteMatches():
@@ -17,8 +19,7 @@ def deleteMatches():
         Requires: player_record and matches Tables exist
         Gets: Nothing
         Modifies: Wins and losses for players 0, removes all matches"""
-    DB= connect()
-    c = DB.cursor()
+    (DB,c) = connect()
     c.execute('delete from matches *;')
     c.execute('update player_records set wins=0,  losses=0 where id  <> Null;')
     DB.commit()
@@ -32,8 +33,7 @@ def deletePlayers():
         Requires: Tables, players, player_records and matches exist
         Gets: Nothing
         Modifies: All tables are zeroed out"""
-    DB= connect()
-    c = DB.cursor()
+    (DB,c) = connect()
     
     c.execute('delete from matches  *');
     c.execute('delete from player_records *');
@@ -66,12 +66,17 @@ def registerPlayer(name):
         Gets: player name
         Modifies: 
         notes make a try and catch for error handlling w/ bd  name"""
-    DB= connect()
-    c = DB.cursor()
+    (DB,c) = connect()
     c.execute('insert into players(name) Values(%s)', (name,) );
     """ Get the player ID number for initializing the player record"""
     c.execute ('select id from players where name = %s', (name, ))
     player_id = c.fetchone()
+    '''Sql Query:
+    This query inputs a players record into the Player Record table
+    with the format for the table being ID | Wins | Losses.
+    Since a new player doesn't have any wins or loses they are set to
+    0 to initialize them
+     '''
     c.execute('insert into player_records values( %s , 0, 0)', (player_id[0], ))
     DB.commit()
     DB.close()
@@ -92,8 +97,7 @@ def playerStandings():
          Requires: 
         Gets: Nothing
         Modifies: """
-    DB= connect()
-    c = DB.cursor()
+    (DB,c) = connect()
 
     query = '''select players.id,name, player_records.wins, (player_records.wins + player_records.losses) as matches
             from (players full join player_records on players.id = player_records.id);'''
@@ -114,8 +118,7 @@ def reportMatch(winner, loser):
         Modifies: 
 
         notes make a try and catch for error handlling w/ bd ID number"""
-    DB= connect()
-    c = DB.cursor()
+    (DB,c) = connect()
     """ Get win and loss, increment for player
         check if player exists, if doesn't then insert"""
     ''' To build out, if the player does not exist register them.'''
@@ -148,15 +151,27 @@ def swissPairings():
        Requires: 
         Gets: Nothing
         Modifies: """
-    DB= connect()
-    c = DB.cursor()
-    c.execute('''select players.id, players.name
-                from players
-                join player_records on players.id = player_records.id
-                order by player_records.wins desc;''')
+    (DB,c) = connect()
+
+
+   
+    ''' swissQeuery returns a list of all players ranked by the number of wins.
+    This ranked ordering is then used to pair up set of players for a match
+    The Query is build by pulling Player ID and Name from the player table,
+    the number of wins are then used to sort the player ID and Name.
+    Note the Player windows are not actually returned as part of query.
+    '''
+    c.execute('''select * from swissQuery;''')
 
     matches = c.fetchall();
     pairings = list()
+    '''Check For Odd Number of Playser'''
+    if (countPlayers() % 2 =1) :
+        
+        if(!byecheck(skippedPlayer)):
+            '''If the player doesn't have a bye skip they get one '''
+
+    else:
  
     for  x in range(0, len(matches),2):
         pairings.append( (list(matches[x])+ list(matches[x+1])) )
@@ -172,8 +187,7 @@ def updatePlayerRecords(winner, loser):
     '''    
 
 
-    DB= connect()
-    c = DB.cursor()
+    (DB,c) = connect()
 
     
     query1 = '''update player_records
@@ -196,8 +210,7 @@ def updatePlayerRecords(winner, loser):
 
 
 def playerExists(id):
-    DB = psychopg2.connect("dbname=tournament")
-    c=DB.cursor()
+    (DB,c) = connect()
 
     c.execute('''select name  from players where id = %s''', (id,))
     if (c.fetchone() != 0 ):
@@ -212,3 +225,32 @@ def OMW(player_id):
     
     oponents 
 '''
+
+def getPlayerID(name):
+    '''This function returns the ID of the player specifed'''
+    
+    try:
+        c.execute ('select id from players where name = %s', (name, ))
+        player_id = c.fetchone()
+
+    return player_id
+
+
+def byeCheck(player_id):
+    '''This Method checks to see if a player has received a Bye pass 
+    due to an odd number of players. If they have the method returns true. 
+    Otherwise it reutnrs false
+    Bye skips are recorded by having the Match table have no entry for a winner
+    Requires: No special requirements
+
+    '''
+    (DB, c) =connect()
+
+    c.execute('''select winner from player_record where loser IS NULL''' )
+    oddMan = c.fetchall;
+
+    for each x in oddMan:
+        if(x = player_id):
+            return true
+        else:
+            return false

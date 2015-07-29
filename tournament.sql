@@ -7,20 +7,25 @@
 -- these lines here.
 
 
-
-
-create table players(
-id  serial Primary Key,
+CREATE TABLE players(
+id  SERIAL PRIMARY KEY,
 name varchar(55));
 
-create table matches(
-#match_id serial,
-round   serial,
-winner integer  References players(id),
-loser integer References players(id) );
+CREATE TABLE matches(
+round   SERIAL,
+winner INTEGER  REFERENCES players(id),
+loser INTEGER REFERENCES players(id) );
 
 
-create table player_records(
-id integer  References players(id), 
-wins integer,
-losses integer);
+CREATE TABLE player_records(
+id INTEGER  REFERENCES players(id), 
+wins INTEGER DEFAULT 0,
+losses INTEGER DEFAULT 0);
+
+--View used to simplify code, returns an orderd set of Swiss Pairings
+CREATE VIEW swissQuery AS
+SELECT players.id, players.name
+FROM players
+JOIN player_records 
+	ON players.id = player_records.id
+ORDER BY player_records.wins DESC;

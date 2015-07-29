@@ -9,19 +9,27 @@
  Swiss tournament  is a library that tracks and records siwss tournaments. THe player and records are stored in a postgresql database.
 
 
+Requirements
+------------------
+This library requires that PostGresSQL >= 9.3.7 be installed as well as Python >=2.7.1. An SQL Script has been included to setup the datbase enviromentent for the library to work.
+
 Instructions
 ------------------
-Use the methods defiend in tournmanet.py to start and record  player matches.
- 
+    Setting up Enviorment
+    ------------------
+    To setup the enviroment for the tournament app to work please run the Tournament.sql.
+    A dtabase named tournament needs to exist for the script to work. If this is the first time you're using this library you can setup the database using thefollowing commands:
+    $ psql
+    daatase=> CREATE DATABASE tournament;
+    databasse=> \c tournament;
+    You can execute the setup script from the PSQL commandline 
+    tournament=> \i tournament.sql;
 
-reportMatch(winner, loser) - 
+    If the database is already setup  onlly the setup script needs to be run. To run the script navigate to the directory and use the following command to created the necessary tables
+    $ psql -f tournament.sql
 
-deleteMatches() - 
 
-playerStandings() - 
-
-swissPairings()
-
+   
 
 Documentation
 ------------------
