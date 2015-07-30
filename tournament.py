@@ -46,8 +46,8 @@ def countPlayers():
         Requires: 
         Gets: Nothing
         Modifies: """
-    DB= connect()
-    c = DB.cursor()
+    (DB, c)= connect()
+    
     c.execute('select count(*) from players;');
     playersCount = c.fetchone()[0]
     DB.close()
@@ -164,15 +164,23 @@ def swissPairings():
     matches = c.fetchall();
     pairings = list()
     '''Check For Odd Number of Playser'''
-    if (countPlayers() % 2 =1) :
+    if (countPlayers() % 2 == 1 ) :
+
+        ''''If there are an odd number of players check to see if the person in last place
+        has gotten a Bye skip. if so  move to teh 2nd to last player.
+        If everyone has a skip then give it to the last person. '''''
         
-        if(!byecheck(skippedPlayer)):
-            '''If the player doesn't have a bye skip they get one '''
+        c.execute(''' select player_ID from  byeStandings;''')
+        skippedPlayers = c.fetchall()
+        for player in pairings:
+            if player not in skippedPlayers:
+                '''If the player doesn't have a bye skip they get one '''
+        
 
     else:
- 
-    for  x in range(0, len(matches),2):
-        pairings.append( (list(matches[x])+ list(matches[x+1])) )
+     
+        for  x in range(0, len(matches),2):
+            pairings.append( (list(matches[x])+ list(matches[x+1])) )
 
     DB.close()
     return pairings
@@ -212,29 +220,34 @@ def playerExists(id):
 
     c.execute('''select name  from players where id = %s''', (id,))
     if (c.fetchone() != 0 ):
+        DB.close()
         return false
     else:
+        DB.close()
         return true
 '''
-Stub to implmenet OMW 
+Stub to implmenet OMW '''
 def OMW(player_id):
     '''select the player and sum all of the  wins from  oponent'''
-    DB =  connect()
+    (DB, c) =  connect()
+
+    DB.close()
     
-    oponents 
-'''
 
 def getPlayerID(name):
     '''This function returns the ID of the player specifed'''
-    
+    (DB, c) = connect()
     try:
-        c.execute ('select id from players where name = %s', (name, ))
+        c.execute ('''select id from players where name = %s''', (name, ))
         player_id = c.fetchone()
+    
+    except Execption:
+        return null
 
     return player_id
 
 
-def byeCheck(player_id):
+def byeSkipped(player_id):
     '''This Method checks to see if a player has received a Bye pass 
     due to an odd number of players. If they have the method returns true. 
     Otherwise it reutnrs false
@@ -247,8 +260,8 @@ def byeCheck(player_id):
     c.execute('''select winner from player_record where loser IS NULL''' )
     oddMan = c.fetchall;
 
-    for each x in oddMan:
-        if(x = player_id):
+    for x in oddMan:
+        if(x == player_id):
             return true
         else:
             return false
