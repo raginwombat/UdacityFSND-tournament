@@ -11,7 +11,8 @@
 
 Requirements
 ------------------
-This library requires that PostGresSQL >= 9.3.7 be installed as well as Python >=2.7.1. An SQL Script has been included to setup the datbase enviromentent for the library to work.
+This library requires that PostGresSQL >= 9.3.7 be installed as well as Python >=2.7.1. A SQL Script has been included to setup the datbase enviromentent for the library to work.
+If more instruction is needed on installing or setting up PostGreSQL or Python please refer to their documentation at their websites postgresql.com/docs and python.com/docs.
 
 Instructions
 ------------------
@@ -19,17 +20,25 @@ Instructions
     ------------------
     To setup the enviroment for the tournament app to work please run the Tournament.sql.
     A dtabase named tournament needs to exist for the script to work. If this is the first time you're using this library you can setup the database using thefollowing commands:
+    
     $ psql
     daatase=> CREATE DATABASE tournament;
     databasse=> \c tournament;
     You can execute the setup script from the PSQL commandline 
     tournament=> \i tournament.sql;
 
+
+
     If the database is already setup  onlly the setup script needs to be run. To run the script navigate to the directory and use the following command to created the necessary tables
     $ psql -f tournament.sql
 
 
-   
+    Running Test File
+    ------------------    
+    Included in the library is a python script to test the library with player senarios.The test script requires that the database be already setup (See Setting up Environment) in the environment prior to running.
+
+    TO run the test file navigate to the dirctory that contains the tournament.py and tournament_test.py files. Wse the following command to run the test file:
+    $ python tournment_test.py
 
 Documentation
 ------------------

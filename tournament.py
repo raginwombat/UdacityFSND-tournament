@@ -99,8 +99,7 @@ def playerStandings():
         Modifies: """
     (DB,c) = connect()
 
-    query = '''select players.id,name, player_records.wins, (player_records.wins + player_records.losses) as matches
-            from (players full join player_records on players.id = player_records.id);'''
+    query = ''' select * from standingsQuery;'''
     c.execute(query);
     standing =c.fetchall()
     DB.close()
@@ -152,7 +151,6 @@ def swissPairings():
         Gets: Nothing
         Modifies: """
     (DB,c) = connect()
-
 
    
     ''' swissQeuery returns a list of all players ranked by the number of wins.
@@ -254,3 +252,8 @@ def byeCheck(player_id):
             return true
         else:
             return false
+
+
+
+def countWins(player_id):
+        '''Count the wins for a player'''
